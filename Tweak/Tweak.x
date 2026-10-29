@@ -1,10 +1,8 @@
 #import <UIKit/UIKit.h>
-#import <SwiftUI/SwiftUI.h>
 #import "AuthManager.h"
 
-// Gọi class từ Swift sang Obj-C
-@interface MenuController : NSObject
-+ (UIViewController *)getView;
+// Khai báo class UI bằng Obj-C
+@interface ModMenuViewController : UIViewController
 @end
 
 static UIWindow *overlayWindow;
@@ -16,8 +14,10 @@ static UIWindow *overlayWindow;
         if (!overlayWindow) {
             overlayWindow = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
             overlayWindow.windowLevel = UIWindowLevelAlert + 1;
-            overlayWindow.rootViewController = [MenuController getView];
             overlayWindow.backgroundColor = [UIColor clearColor];
+            
+            // Gọi trực tiếp class Obj-C
+            overlayWindow.rootViewController = [[ModMenuViewController alloc] init];
             overlayWindow.rootViewController.view.backgroundColor = [UIColor clearColor];
             [overlayWindow makeKeyAndVisible];
         }
