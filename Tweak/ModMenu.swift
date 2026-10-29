@@ -42,8 +42,8 @@ struct MenuView: View {
     }
 }
 
-@objc class MenuController: NSObject {
-    @objc static func getView() -> UIViewController {
+@objc public class MenuController: NSObject {
+    @objc public static func getView() -> UIViewController {
         return UIHostingController(rootView: MenuView())
     }
 }
