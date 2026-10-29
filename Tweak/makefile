@@ -6,5 +6,6 @@ include $(THEOS)/makefiles/common.mk
 TWEAK_NAME = AIMLD
 AIMLD_FILES = Tweak.x AuthManager.m ModMenu.swift
 AIMLD_CFLAGS = -fobjc-arc
-AIMLD_SWIFTFLAGS = -swift-version 5
+AIMLD_SWIFTFLAGS = -swift-version 5 -import-objc-header Bridging-Header.h
+
 include $(THEOS_MAKE_PATH)/tweak.mk

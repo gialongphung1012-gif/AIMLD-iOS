@@ -1,17 +1,5 @@
 import SwiftUI
 
-// Bắc cầu sang Objective-C
-@objc class AuthManagerBridge: NSObject {
-    @objc static func validate(key: String, completion: @escaping (Bool, Bool) -> Void) {
-        AuthManager.shared().validateKey(key) { success, isAdmin in
-            completion(success, isAdmin)
-        }
-    }
-    @objc static func isAdmin() -> Bool {
-        return UserDefaults.standard.bool(forKey: "AIMLD_Admin")
-    }
-}
-
 struct MenuView: View {
     @State private var isActivated = UserDefaults.standard.bool(forKey: "AIMLD_Activated")
     @State private var keyInput = ""
@@ -29,7 +17,7 @@ struct MenuView: View {
                         .cornerRadius(8).foregroundColor(.white).autocapitalization(.allCharacters)
                     
                     Button("Kích Hoạt") {
-                        AuthManagerBridge.validate(key: keyInput) { success, isAdmin in
+                        AuthManager.shared().validateKey(keyInput) { success, isAdmin in
                             if success { isActivated = true } else { errorMsg = "Sai Key!" }
                         }
                     }.padding().frame(maxWidth: .infinity)
@@ -42,7 +30,7 @@ struct MenuView: View {
                     HStack {
                         Text("AIMLD Menu").foregroundColor(.purple).bold()
                         Spacer()
-                        if AuthManagerBridge.isAdmin() {
+                        if UserDefaults.standard.bool(forKey: "AIMLD_Admin") {
                             Text("ADMIN").padding(4).background(Color.red)
                                 .cornerRadius(4).foregroundColor(.white).font(.caption)
                         }
