@@ -1,0 +1,5 @@
+{
+    Filter = {
+        Bundles = ("com.garena.game.kgvn", "com.dts.freefireth", "com.dts.freefiremax");
+    };
+}

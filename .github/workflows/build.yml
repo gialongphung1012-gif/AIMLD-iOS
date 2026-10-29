@@ -1,0 +1,41 @@
+name: Build AIMLD IPA
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Theos
+      run: |
+        git clone --recursive https://github.com/theos/theos.git $HOME/theos
+        echo "THEOS=$HOME/theos" >> $GITHUB_ENV
+
+    - name: Install tools
+      run: brew install ldid dpkg
+
+    - name: Build Tweak
+      run: |
+        cd Tweak
+        make clean || true
+        make package FINALPACKAGE=1
+
+    - name: Extract Dylib
+      run: |
+        cd Tweak
+        DEB=$(find . -name "*.deb" | head -n 1)
+        dpkg-deb -x "$DEB" extracted
+        mkdir -p ../output
+        find extracted -name "AIMLD.dylib" -exec cp {} ../output/ \;
+        find extracted -name "AIMLD.plist" -exec cp {} ../output/ \;
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: AIMLD-Dylib
+        path: output/

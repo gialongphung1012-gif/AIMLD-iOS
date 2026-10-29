@@ -1,0 +1,9 @@
+Package: com.freddy.aimld
+Name: AIMLD
+Version: 1.0.0
+Architecture: iphoneos-arm
+Description: AIMLD Premium Menu
+Maintainer: Freddy
+Author: Freddy
+Section: Tweaks
+Depends: mobilesubstrate
