@@ -1,5 +1,17 @@
 import SwiftUI
 
+// Bắc cầu sang Objective-C
+@objc class AuthManagerBridge: NSObject {
+    @objc static func validate(key: String, completion: @escaping (Bool, Bool) -> Void) {
+        AuthManager.shared().validateKey(key) { success, isAdmin in
+            completion(success, isAdmin)
+        }
+    }
+    @objc static func isAdmin() -> Bool {
+        return UserDefaults.standard.bool(forKey: "AIMLD_Admin")
+    }
+}
+
 struct MenuView: View {
     @State private var isActivated = UserDefaults.standard.bool(forKey: "AIMLD_Activated")
     @State private var keyInput = ""
@@ -15,12 +27,14 @@ struct MenuView: View {
                     TextField("AIMLD-XXXX-XXXX", text: $keyInput)
                         .padding().background(Color.gray.opacity(0.3))
                         .cornerRadius(8).foregroundColor(.white).autocapitalization(.allCharacters)
+                    
                     Button("Kích Hoạt") {
-                        AuthManager.shared().validateKey(keyInput) { success, isAdmin in
+                        AuthManagerBridge.validate(key: keyInput) { success, isAdmin in
                             if success { isActivated = true } else { errorMsg = "Sai Key!" }
                         }
                     }.padding().frame(maxWidth: .infinity)
                         .background(Color.purple).cornerRadius(8).foregroundColor(.white)
+                    
                     if !errorMsg.isEmpty { Text(errorMsg).foregroundColor(.red) }
                 }.padding()
             } else {
@@ -28,7 +42,7 @@ struct MenuView: View {
                     HStack {
                         Text("AIMLD Menu").foregroundColor(.purple).bold()
                         Spacer()
-                        if UserDefaults.standard.bool(forKey: "AIMLD_Admin") {
+                        if AuthManagerBridge.isAdmin() {
                             Text("ADMIN").padding(4).background(Color.red)
                                 .cornerRadius(4).foregroundColor(.white).font(.caption)
                         }
