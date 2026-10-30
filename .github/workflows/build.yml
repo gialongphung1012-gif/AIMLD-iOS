@@ -32,10 +32,23 @@ jobs:
         dpkg-deb -x "$DEB" extracted
         mkdir -p ../output
         find extracted -name "AIMLD.dylib" -exec cp {} ../output/ \;
-        find extracted -name "AIMLD.plist" -exec cp {} ../output/ \;
 
-    - name: Upload Artifact
+    - name: Download Free Fire IPA
+      run: |
+        # === THAY LINK IPA CỦA BẠN VÀO ĐÂY ===
+        # Lưu ý: Link phải là link tải trực tiếp (Direct Link). 
+        # Nếu dùng Google Drive, hãy dùng tool để lấy link direct.
+        wget -O FreeFire.ipa "https://link_download_ipa_cua_ban/freefire.ipa"
+
+    - name: Inject Dylib and Sign
+      run: |
+        # Cài Azule (Công cụ chèn Dylib tự động)
+        brew install azule
+        # Chèn file AIMLD.dylib vào IPA và xuất ra file mới
+        azule -i FreeFire.ipa -o AIMLD_FreeFire.ipa -f output/AIMLD.dylib
+
+    - name: Upload Final IPA
       uses: actions/upload-artifact@v4
       with:
-        name: AIMLD-Dylib
-        path: output/
+        name: AIMLD-Final-IPA
+        path: AIMLD_FreeFire.ipa
