@@ -33,31 +33,41 @@ jobs:
         mkdir -p ../output
         find extracted -name "AIMLD.dylib" -exec cp {} ../output/ \;
 
-    - name: Download Free Fire IPA
+    - name: Download Free Fire IPA from Gofile
       run: |
-        wget --no-check-certificate -O FreeFire.ipa "https://drive.google.com/uc?export=download&id=1JldXUQdg4mvnWYKxUokggw7Hv6gnLIny"
+        # Dùng API của Gofile để lấy link tải trực tiếp từ ID file
+        # ID này lấy từ link: https://gofile.io/d/722487df-5376-4417-9f17-37af18c2c9a4
+        FILE_ID="722487df-5376-4417-9f17-37af18c2c9a4"
+        
+        # Gọi API lấy thông tin file
+        RESPONSE=$(curl -s "https://api.gofile.io/getContent?contentId=$FILE_ID&token=undefined")
+        
+        # Trích xuất link tải trực tiếp
+        DIRECT_LINK=$(echo $RESPONSE | python3 -c "import sys, json; print(json.load(sys.stdin)['data']['contents'][list(json.load(sys.stdin)['data']['contents'].keys())[0]]['link'])")
+        
+        echo "Đang tải từ: $DIRECT_LINK"
+        curl -L -o FreeFire.ipa "$DIRECT_LINK"
+        
+        # Kiểm tra dung lượng file
+        FILE_SIZE=$(stat -f%z FreeFire.ipa)
+        if [ "$FILE_SIZE" -lt 100000000 ]; then
+          echo "Lỗi: File tải về quá nhỏ, có thể link đã hỏng."
+          exit 1
+        fi
 
     - name: Inject Dylib Manually
       run: |
-        # Giải nén file IPA
         unzip -q FreeFire.ipa -d extracted_ipa
         APP_PATH=$(find extracted_ipa/Payload -name "*.app" | head -n 1)
-        
-        # Copy file dylib vào thư mục app
         cp output/AIMLD.dylib "$APP_PATH/"
-        
-        # Chèn dòng load dylib vào file thực thi chính
         APP_NAME=$(basename "$APP_PATH" .app)
         EXEC_PATH="$APP_PATH/$APP_NAME"
         
-        # Tạo file entitlements
         echo '<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"><plist version="1.0"><dict><key>platform-application</key><true/><key>com.apple.private.security.no-container</key><true/><key>get-task-allow</key><true/></dict></plist>' > ent.plist
         
-        # Ký (Sign) lại app và dylib
         ldid -Sent.plist "$APP_PATH/AIMLD.dylib"
         ldid -Sent.plist "$EXEC_PATH"
         
-        # Đóng gói lại thành file IPA
         cd extracted_ipa
         zip -qry ../AIMLD_FreeFire.ipa Payload
         cd ..
