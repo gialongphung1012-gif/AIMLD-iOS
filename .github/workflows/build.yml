@@ -33,11 +33,12 @@ jobs:
         mkdir -p ../output
         find extracted -name "AIMLD.dylib" -exec cp {} ../output/ \;
 
-    -     - name: Download Free Fire IPA
+    - name: Download Free Fire IPA
       run: |
+        # Link tải trực tiếp từ Google Drive (ID file của Freddy)
         wget --no-check-certificate -O FreeFire.ipa "https://drive.google.com/uc?export=download&id=1JldXUQdg4mvnWYKxUokggw7Hv6gnLIny"
 
-    - name: Inject Dylib and Sign
+    - name: Inject Dylib
       run: |
         # Cài Azule (Công cụ chèn Dylib tự động)
         brew install azule
