@@ -33,27 +33,9 @@ jobs:
         mkdir -p ../output
         find extracted -name "AIMLD.dylib" -exec cp {} ../output/ \;
 
-    - name: Download Free Fire IPA from Gofile
+    - name: Download Free Fire IPA
       run: |
-        # Dùng API của Gofile để lấy link tải trực tiếp từ ID file
-        # ID này lấy từ link: https://gofile.io/d/722487df-5376-4417-9f17-37af18c2c9a4
-        FILE_ID="722487df-5376-4417-9f17-37af18c2c9a4"
-        
-        # Gọi API lấy thông tin file
-        RESPONSE=$(curl -s "https://api.gofile.io/getContent?contentId=$FILE_ID&token=undefined")
-        
-        # Trích xuất link tải trực tiếp
-        DIRECT_LINK=$(echo $RESPONSE | python3 -c "import sys, json; print(json.load(sys.stdin)['data']['contents'][list(json.load(sys.stdin)['data']['contents'].keys())[0]]['link'])")
-        
-        echo "Đang tải từ: $DIRECT_LINK"
-        curl -L -o FreeFire.ipa "$DIRECT_LINK"
-        
-        # Kiểm tra dung lượng file
-        FILE_SIZE=$(stat -f%z FreeFire.ipa)
-        if [ "$FILE_SIZE" -lt 100000000 ]; then
-          echo "Lỗi: File tải về quá nhỏ, có thể link đã hỏng."
-          exit 1
-        fi
+        wget -O FreeFire.ipa "https://github.com/gialongphung1012-gif/AIMLD-iOS/releases/download/v1.0/com.dts.freefireth_1.132.1_und3fined.ipa"
 
     - name: Inject Dylib Manually
       run: |
