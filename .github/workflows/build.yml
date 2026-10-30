@@ -35,15 +35,32 @@ jobs:
 
     - name: Download Free Fire IPA
       run: |
-        # Link tải trực tiếp từ Google Drive (ID file của Freddy)
         wget --no-check-certificate -O FreeFire.ipa "https://drive.google.com/uc?export=download&id=1JldXUQdg4mvnWYKxUokggw7Hv6gnLIny"
 
-    - name: Inject Dylib
+    - name: Inject Dylib Manually
       run: |
-        # Cài Azule (Công cụ chèn Dylib tự động)
-        brew install azule
-        # Chèn file AIMLD.dylib vào IPA và xuất ra file mới
-        azule -i FreeFire.ipa -o AIMLD_FreeFire.ipa -f output/AIMLD.dylib
+        # Giải nén file IPA
+        unzip -q FreeFire.ipa -d extracted_ipa
+        APP_PATH=$(find extracted_ipa/Payload -name "*.app" | head -n 1)
+        
+        # Copy file dylib vào thư mục app
+        cp output/AIMLD.dylib "$APP_PATH/"
+        
+        # Chèn dòng load dylib vào file thực thi chính
+        APP_NAME=$(basename "$APP_PATH" .app)
+        EXEC_PATH="$APP_PATH/$APP_NAME"
+        
+        # Tạo file entitlements
+        echo '<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"><plist version="1.0"><dict><key>platform-application</key><true/><key>com.apple.private.security.no-container</key><true/><key>get-task-allow</key><true/></dict></plist>' > ent.plist
+        
+        # Ký (Sign) lại app và dylib
+        ldid -Sent.plist "$APP_PATH/AIMLD.dylib"
+        ldid -Sent.plist "$EXEC_PATH"
+        
+        # Đóng gói lại thành file IPA
+        cd extracted_ipa
+        zip -qry ../AIMLD_FreeFire.ipa Payload
+        cd ..
 
     - name: Upload Final IPA
       uses: actions/upload-artifact@v4
