@@ -33,12 +33,9 @@ jobs:
         mkdir -p ../output
         find extracted -name "AIMLD.dylib" -exec cp {} ../output/ \;
 
-    - name: Download Free Fire IPA
+    -     - name: Download Free Fire IPA
       run: |
-        # === THAY LINK IPA CỦA BẠN VÀO ĐÂY ===
-        # Lưu ý: Link phải là link tải trực tiếp (Direct Link). 
-        # Nếu dùng Google Drive, hãy dùng tool để lấy link direct.
-        wget -O FreeFire.ipa "https://link_download_ipa_cua_ban/freefire.ipa"
+        wget --no-check-certificate -O FreeFire.ipa "https://drive.google.com/uc?export=download&id=1JldXUQdg4mvnWYKxUokggw7Hv6gnLIny"
 
     - name: Inject Dylib and Sign
       run: |
