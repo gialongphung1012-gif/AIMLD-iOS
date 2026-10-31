@@ -6,5 +6,6 @@ include $(THEOS)/makefiles/common.mk
 TWEAK_NAME = AIMLD
 AIMLD_FILES = Tweak.x AuthManager.m ModMenu.m
 AIMLD_CFLAGS = -fobjc-arc
+AIMLD_FRAMEWORKS = UIKit Foundation SwiftUI
 
 include $(THEOS_MAKE_PATH)/tweak.mk
