@@ -14,7 +14,7 @@ static UIButton *floatingBtn;
 static BOOL isEspEnabled = NO;
 static BOOL isAimbotEnabled = NO;
 static BOOL isNoRecoilEnabled = NO;
-static BOOL isCarSpeedEnabled = NO;
+static BOOL isCarSpeedEnabled __attribute__((unused)) = NO;
 
 // Hàm lấy Base Address của game
 uintptr_t getBaseAddress() {
